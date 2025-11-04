@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 800px;
+      height: 600px;
+      margin: 0;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+    }
+    
+    button:hover {
+      background: #45a049;
+    }
+    
+    #clear-btn {
+      background: #f44336;
+    }
+    
+    #clear-btn:hover {
+      background: #d32f2f;
+    }
+    
+    #export-btn {
+      background: #2196F3;
+    }
+    
+    #export-btn:hover {
+      background: #1976D2;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    #filter {
+      padding: 5px;
+      flex: 1;
+    }
+    
+    .request-list {
+      height: 450px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+    
+    .request-item {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+      word-break: break-all;
+      cursor: pointer;
+    }
+    
+    .request-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .request-item.active {
+      background-color: #e3f2fd;
+      border-left: 3px solid #2196F3;
+    }
+    
+    .method {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      margin-right: 5px;
+      color: white;
+    }
+    
+    .GET { background: #4CAF50; }
+    .POST { background: #2196F3; }
+    .PUT { background: #FF9800; }
+    .DELETE { background: #F44336; }
+    .PATCH { background: #9C27B0; }
+    .OPTIONS { background: #607D8B; }
+    .HEAD { background: #795548; }
+    
+    .status {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    
+    .status-2xx { background: #4CAF50; color: white; }
+    .status-3xx { background: #2196F3; color: white; }
+    .status-4xx { background: #FF9800; color: white; }
+    .status-5xx { background: #F44336; color: white; }
+    
+    .url {
+      color: #333;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+    }
+    
+    .detail-panel {
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .detail-tabs {
+      display: flex;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .detail-tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      border-right: 1px solid #ddd;
+    }
+    
+    .detail-tab.active {
+      background: white;
+      border-bottom: 2px solid #2196F3;
+    }
+    
+    .detail-content {
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+    }
+    
+    .request-info {
+      margin-bottom: 10px;
+      padding: 8px;
+      background: #f9f9f9;
+      border-radius: 3px;
+    }
+    
+    .request-line {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .header-item {
+      margin-bottom: 2px;
+    }
+    
+    .header-key {
+      font-weight: bold;
+      color: #2196F3;
+    }
+    
+    .param-item {
+      margin-bottom: 2px;
+    }
+    
+    .param-key {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h3>网站请求路径抓取器 - 增强版</h3>
+    <div class="controls">
+      <button id="capture-btn">开始捕获</button>
+      <button id="pause-btn">暂停捕获</button>
+      <button id="clear-btn">清空列表</button>
+      <button id="export-btn">导出数据</button>
+    </div>
+  </div>
+  
+  <div class="filters">
+    <input type="text" id="filter" placeholder="过滤请求URL...">
+    <select id="method-filter">
+      <option value="">所有方法</option>
+      <option value="GET">GET</option>
+      <option value="POST">POST</option>
+      <option value="PUT">PUT</option>
+      <option value="DELETE">DELETE</option>
+      <option value="PATCH">PATCH</option>
+    </select>
+  </div>
+  
+  <div class="request-list" id="request-list">
+    <div class="empty-state">暂无捕获的请求</div>
+  </div>
+
+  <div class="detail-panel" id="detail-panel" style="display: none;">
+    <div class="detail-tabs">
+      <div class="detail-tab active" data-tab="overview">概览</div>
+      <div class="detail-tab" data-tab="headers">请求头</div>
+      <div class="detail-tab" data-tab="params">请求参数</div>
+      <div class="detail-tab" data-tab="response">响应</div>
+    </div>
+    <div class="detail-content" id="detail-content">
+      <!-- 详情内容将通过JavaScript动态填充 -->
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

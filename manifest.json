@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "网站请求路径抓取器 - 增强版",
+  "version": "1.1",
+  "description": "捕获并显示网站的所有网络请求，包括请求头、请求参数等详细信息",
+  "permissions": [
+    "webRequest",
+    "activeTab",
+    "storage",
+    "webRequestBlocking"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "点击查看捕获的请求"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
