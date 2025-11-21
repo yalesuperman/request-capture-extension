@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "网站请求路径抓取器 - 增强版",
-  "version": "1.1",
+  "name": "网站请求路径抓取器",
+  "version": "1.2",
   "description": "捕获并显示网站的所有网络请求，包括请求头、请求参数等详细信息",
   "permissions": [
     "webRequest",

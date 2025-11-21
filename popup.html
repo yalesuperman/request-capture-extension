@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       width: 800px;
       height: 600px;
       margin: 0;
       padding: 10px;
       font-family: Arial, sans-serif;
+      overflow-x: hidden;
+      background: #f3f4f6;
     }
     
     .header {
@@ -62,32 +68,70 @@
     }
     
     #filter {
-      padding: 5px;
+      padding: 6px 10px;
       flex: 1;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+      background-color: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #filter:focus {
+      border-color: #2196F3;
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
+    }
+
+    #method-filter {
+      padding: 6px 10px;
+      min-width: 110px;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      font-size: 12px;
+      background-color: #fff;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    #method-filter:focus {
+      border-color: #2196F3;
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
+      background-color: #fdfefe;
     }
     
     .request-list {
       height: 450px;
       overflow-y: auto;
+      overflow-x: hidden;
       border: 1px solid #ddd;
       border-radius: 3px;
+      background: #fafafa;
+      padding: 4px 0;
     }
     
     .request-item {
-      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
       border-bottom: 1px solid #eee;
       font-size: 12px;
-      word-break: break-all;
       cursor: pointer;
+      background-color: #fff;
+      border-left: 3px solid transparent;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
     
     .request-item:hover {
       background-color: #f5f5f5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     }
     
     .request-item.active {
       background-color: #e3f2fd;
-      border-left: 3px solid #2196F3;
+      border-left-color: #2196F3;
     }
     
     .method {
@@ -111,8 +155,9 @@
       display: inline-block;
       padding: 2px 6px;
       border-radius: 3px;
-      margin-left: 5px;
+      margin-left: 2px;
       font-weight: bold;
+      flex-shrink: 0;
     }
     
     .status-2xx { background: #4CAF50; color: white; }
@@ -121,7 +166,12 @@
     .status-5xx { background: #F44336; color: white; }
     
     .url {
+      flex: 1;
+      min-width: 0;
       color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     
     .empty-state {
@@ -131,51 +181,164 @@
     }
     
     .detail-panel {
-      margin-top: 10px;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      max-height: 300px;
-      overflow-y: auto;
+      margin: 8px 12px 12px 26px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 6px 12px;
+      border-bottom: 1px solid #eee;
+      background: #f7f7f8;
+    }
+
+    .detail-copy-btn {
+      padding: 3px 8px;
+      font-size: 11px;
+      background: #607D8B;
+    }
+
+    .detail-copy-btn:hover {
+      background: #546E7A;
     }
     
     .detail-tabs {
       display: flex;
-      background: #f5f5f5;
-      border-bottom: 1px solid #ddd;
+      background: #f9fafb;
+      border-bottom: 1px solid #eee;
+      padding: 0 6px;
     }
     
     .detail-tab {
-      padding: 8px 16px;
+      padding: 8px 14px;
       cursor: pointer;
       border-right: 1px solid #ddd;
+      font-size: 12px;
+      color: #555;
+      user-select: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
     
     .detail-tab.active {
       background: white;
       border-bottom: 2px solid #2196F3;
+      color: #2196F3;
+      font-weight: bold;
+    }
+
+    .detail-tab:hover {
+      background: #eef2f7;
     }
     
     .detail-content {
-      padding: 10px;
-      font-family: monospace;
-      font-size: 11px;
-      white-space: pre-wrap;
+      height: 300px;
+      padding: 20px 16px 18px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      overflow: auto;
+      background: #fcfcfc;
+      line-height: 1.5;
+    }
+
+    .detail-content h4 {
+      margin: 4px 0 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      padding-left: 6px;
+      border-left: 3px solid #2196F3;
+    }
+
+    .detail-content strong {
+      color: #555;
     }
     
     .request-info {
-      margin-bottom: 10px;
-      padding: 8px;
+      margin-bottom: 12px;
+      padding: 8px 10px;
       background: #f9f9f9;
-      border-radius: 3px;
+      border-radius: 4px;
+      border: 1px solid #eee;
     }
     
     .request-line {
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .overview-method-tag {
+      font-size: 11px;
+      margin-right: 4px;
+    }
+
+    .overview-url-text {
+      flex: 1;
+      min-width: 0;
+      font-weight: 500;
+      color: #222;
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .overview-status-tag {
+      font-size: 11px;
+    }
+
+    .overview-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 18px;
+      margin-top: 2px;
+    }
+
+    .overview-meta-item {
+      display: flex;
+      gap: 4px;
+      min-width: 120px;
+      font-size: 11px;
+    }
+
+    .overview-meta-wide {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .overview-meta-label {
+      color: #888;
+    }
+
+    .overview-meta-value {
+      color: #333;
+    }
+
+    .overview-count-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .overview-count-badge {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef2f7;
+      font-size: 11px;
+      color: #555;
     }
     
     .header-item {
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     
     .header-key {
@@ -184,7 +347,7 @@
     }
     
     .param-item {
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     
     .param-key {
@@ -195,7 +358,7 @@
 </head>
 <body>
   <div class="header">
-    <h3>网站请求路径抓取器 - 增强版</h3>
+    <h3>网站请求路径抓取器</h3>
     <div class="controls">
       <button id="capture-btn">开始捕获</button>
       <button id="pause-btn">暂停捕获</button>
@@ -218,18 +381,6 @@
   
   <div class="request-list" id="request-list">
     <div class="empty-state">暂无捕获的请求</div>
-  </div>
-
-  <div class="detail-panel" id="detail-panel" style="display: none;">
-    <div class="detail-tabs">
-      <div class="detail-tab active" data-tab="overview">概览</div>
-      <div class="detail-tab" data-tab="headers">请求头</div>
-      <div class="detail-tab" data-tab="params">请求参数</div>
-      <div class="detail-tab" data-tab="response">响应</div>
-    </div>
-    <div class="detail-content" id="detail-content">
-      <!-- 详情内容将通过JavaScript动态填充 -->
-    </div>
   </div>
 
   <script src="popup.js"></script>
